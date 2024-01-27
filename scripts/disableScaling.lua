@@ -10,6 +10,9 @@ REG_VRAMRW = 0x3c0002
 SCB2 = 0x8000
 SCB3 = 0x8200
 
+next_vram_index = 0
+vram_index_mod = 1
+
 function on_vram_write(offset, data)
 	if offset == REG_VRAMADDR then
 		next_vram_index = data
