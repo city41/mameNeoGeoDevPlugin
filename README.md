@@ -8,6 +8,12 @@ I'm making these a lot and throwing them away or copying/pasting, etc, so I figu
 
 Maybe eventually these will all get combined into a decent Neo Geo debug plugin.
 
+## Example
+
+An example of one script (spriteLengthAndFixLayer.lua) running
+
+![example](https://github.com/city41/ngDebugScripts/blob/main/spriteLengthAndFixLayer_running.png?raw=true)
+
 ## To use
 
 ### First, keyboard_events
