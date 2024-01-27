@@ -55,16 +55,19 @@ function on_vram_write(offset, data)
 	end
 end
 
--- given a sprite index and an array of vram, returns how tall this sprite is
-function getSpriteHeight(si, vr)
-	local scb3Val = vr[SCB3 + si] or 0
-	return scb3Val & 0x3f
-end
-
 function isSticky(si, vr)
 	local scb3Val = vr[SCB3 + si] or 0
 
 	return scb3Val & 0x40 == 0x40
+end
+
+function getSpriteHeight(si, vr)
+	if isSticky(si, vr) then
+		return getSpriteHeight(si - 1, vr)
+	end
+
+	local scb3Val = vr[SCB3 + si] or 0
+	return scb3Val & 0x3f
 end
 
 function getSpriteY(si, vr)
@@ -73,11 +76,28 @@ function getSpriteY(si, vr)
 	end
 
 	local scb3Val = vr[SCB3 + si] or 0
+
 	local y = scb3Val >> 7
 
-	return 496 - y
+	-- handle 9 bit two's compliment
+	if y > 256 then
+		y = y - 512
+	end
+
+	y = 496 - y
+
+	while y > 224 do
+		y = y - 512
+	end
+
+	while y < -224 do
+		y = y + 512
+	end
+
+	return y
 end
 
+-- TODO: support sprite scaling
 function getSpriteX(si, vr)
 	if isSticky(si, vr) then
 		return getSpriteX(si - 1, vr) + 16
@@ -93,7 +113,7 @@ function clamp(v, min, max)
 end
 
 function isOnScreen(x, y, h)
-	return not (x + 16 < 0 or x > 320 or y + h < 0 or y > 224)
+	return not (x + 16 < 0 or x > 320 or y + (h * 16) < 0 or y > 224)
 end
 
 RED = 0xffff0000
