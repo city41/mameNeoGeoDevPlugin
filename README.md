@@ -8,11 +8,15 @@ I'm making these a lot and throwing them away or copying/pasting, etc, so I figu
 
 Maybe eventually these will all get combined into a decent Neo Geo debug plugin.
 
-## Example
+## Examples
 
-An example of one script (spriteLengthAndFixLayer.lua) running
+spriteLengthAndFixLayer.lua
 
-![example](https://github.com/city41/ngDebugScripts/blob/main/spriteLengthAndFixLayer_running.png?raw=true)
+![sprite length and fix layer example](https://github.com/city41/ngDebugScripts/blob/main/spriteLengthAndFixLayer_running.png?raw=true)
+
+spriteBoundingBoxes.lua
+
+![sprite bounding boxes example](https://github.com/city41/ngDebugScripts/blob/main/spriteBoundingBoxes_running.png?raw=true)
 
 ## To use
 
