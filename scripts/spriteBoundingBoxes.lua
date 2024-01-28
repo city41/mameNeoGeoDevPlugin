@@ -47,11 +47,16 @@ function on_vram_write(offset, data)
 			return 0xff
 		end
 
-		if (not SHOW_SPRITES) and next_vram_index >= SCB4 and next_vram_index <= VRAM_SIZE then
-			-- this moves the sprites off the screen, 320 is to account for stickied sprites
-			-- who might be only moving their control sprite
+		-- 155 to 180
+		if next_vram_index >= SCB4 + 155 and next_vram_index <= SCB4 + 180 then
 			return -320
 		end
+
+		-- if (not SHOW_SPRITES) and next_vram_index >= SCB4 and next_vram_index <= VRAM_SIZE then
+		-- 	-- this moves the sprites off the screen, 320 is to account for stickied sprites
+		-- 	-- who might be only moving their control sprite
+		-- 	return -320
+		-- end
 	end
 end
 
@@ -70,6 +75,18 @@ function getSpriteHeight(si, vr)
 	return scb3Val & 0x3f
 end
 
+function dewrap(v, wrapBoundary)
+	while v > wrapBoundary do
+		v = v - 512
+	end
+
+	while v < -wrapBoundary do
+		v = v + 512
+	end
+
+	return v
+end
+
 function getSpriteY(si, vr)
 	if isSticky(si, vr) then
 		return getSpriteY(si - 1, vr)
@@ -86,14 +103,6 @@ function getSpriteY(si, vr)
 
 	y = 496 - y
 
-	while y > 224 do
-		y = y - 512
-	end
-
-	while y < -224 do
-		y = y + 512
-	end
-
 	return y
 end
 
@@ -105,15 +114,17 @@ function getSpriteX(si, vr)
 
 	local scb4Val = vr[SCB4 + si] or 0
 
-	return scb4Val >> 7
+	x = scb4Val >> 7
+
+	return x
 end
 
 function clamp(v, min, max)
 	return math.min(max, math.max(min, v))
 end
 
-function isOnScreen(x, y, h)
-	return not (x + 16 < 0 or x > 320 or y + (h * 16) < 0 or y > 224)
+function isOnScreen(left, top, right, bottom)
+	return not (right < 0 or bottom < 0 or left > 320 or top > 224)
 end
 
 RED = 0xffff0000
@@ -125,18 +136,34 @@ colors = { RED, ORANGE, PURPLE, WHITE }
 
 function visualize_boundingBoxes()
 	for i = 0, 380 do
-		local h = getSpriteHeight(i, vram)
-		local y = getSpriteY(i, vram)
-		local x = getSpriteX(i, vram)
+		local ht = getSpriteHeight(i, vram)
+		local hpx = ht * 16
+		local x = dewrap(getSpriteX(i, vram), 320)
+		local y = dewrap(getSpriteY(i, vram), 224)
 
 		local left = x
 		local top = y
 		-- TODO: support sprite scaling
-		local right = x + 16
+		local right = dewrap(x + 16, 320)
 		-- TODO: support sprite scaling
-		local bottom = y + (h * 16)
+		local bottom = y + hpx
 
-		if isOnScreen(x, y, h) then
+		if bottom > 512 then
+			-- sprite has wrapped back around to the top
+			-- its visible portion starts at the top of the screen
+			top = 0
+			-- and this is the amount that has wrapped and become visible(h * 16)
+			bottom = hpx - (512 - 224)
+		end
+
+		if right > 512 then
+			-- sprite has wrapped back around to the left side
+			-- its visible portion starts at the left of the screen
+			left = 0
+			right = 16 - (512 - 320)
+		end
+
+		if isOnScreen(left, top, right, bottom) then
 			screen:draw_box(
 				clamp(left, 0, 320),
 				clamp(top, 0, 224),
@@ -155,6 +182,20 @@ function on_frame()
 	visualize_boundingBoxes()
 end
 
+function on_pause()
+	for i = 0, 380 do
+		local h = getSpriteHeight(i, vram)
+
+		if h > 0 then
+			local x = getSpriteX(i, vram)
+			local y = getSpriteY(i, vram)
+
+			print(string.format("%d, x: %d, y: %d, h: %d", i, x, y, h))
+		end
+	end
+end
+
 emu.register_frame_done(on_frame, "frame")
+emu.register_pause(on_pause, "pause")
 
 vram_handler = mem:install_write_tap(REG_VRAMADDR, REG_VRAMMOD + 1, "vram", on_vram_write)
