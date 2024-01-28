@@ -47,16 +47,11 @@ function on_vram_write(offset, data)
 			return 0xff
 		end
 
-		-- 155 to 180
-		if next_vram_index >= SCB4 + 155 and next_vram_index <= SCB4 + 180 then
+		if (not SHOW_SPRITES) and next_vram_index >= SCB4 and next_vram_index <= VRAM_SIZE then
+			-- this moves the sprites off the screen, 320 is to account for stickied sprites
+			-- who might be only moving their control sprite
 			return -320
 		end
-
-		-- if (not SHOW_SPRITES) and next_vram_index >= SCB4 and next_vram_index <= VRAM_SIZE then
-		-- 	-- this moves the sprites off the screen, 320 is to account for stickied sprites
-		-- 	-- who might be only moving their control sprite
-		-- 	return -320
-		-- end
 	end
 end
 
@@ -152,7 +147,7 @@ function visualize_boundingBoxes()
 			-- sprite has wrapped back around to the top
 			-- its visible portion starts at the top of the screen
 			top = 0
-			-- and this is the amount that has wrapped and become visible(h * 16)
+			-- and this is the amount that has wrapped and become visible
 			bottom = hpx - (512 - 224)
 		end
 
@@ -160,6 +155,7 @@ function visualize_boundingBoxes()
 			-- sprite has wrapped back around to the left side
 			-- its visible portion starts at the left of the screen
 			left = 0
+			-- and this is the amount that has wrapped and become visible
 			right = 16 - (512 - 320)
 		end
 
