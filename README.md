@@ -24,6 +24,8 @@ spriteBoundingBoxes.lua
 
 Some scripts want `keyboard_events` installed. To do that, copy `scripts/keyboard_events.lua` into your MAME installation's plugin folder. That will vary from OS to OS and even the type of MAME install. For me on Ubuntu using MAME installed from apt, it is at `/usr/share/games/mame/plugins`.
 
+`keyboard_events` was written by stengun for the [arcademus](https://github.com/stengun/arcademus) project. Thank you!
+
 ### Then, launch MAME from the command line
 
 Do `mame -autoboot_script path/to/script/youwant.lua <game>`
