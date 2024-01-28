@@ -38,3 +38,11 @@ If you don't normally run MAME from the command line, you may find the default w
 - `-nofilter`: turn off the blur filter, just get pure pixels
 - `-nomouse`: don't capture the mouse, just leave it alone
 - `-sound none`: disable audio if desired
+
+## Known Issues
+
+I am accessing video ram by placing write taps onto the video registers. Essentially I am "emulating" the video ram registers in lua and grabbing all the values the game sends to video ram and saving them.
+
+This works totally fine in every game I've tested ... except Samurai Shodown 2. If you run SS2 with `spriteLengthAndFixLayer.lua`, and once you are in game, you will see on the fix layer visualization that player one's health bar is missing. But if you look in the actual video ram via MAME's debugger, it's there. So either SS2 does something I don't understand and is able to set these video ram values in another way (seems unlikely), or MAME's Lua taps have a rare bug (possible), or I'm just doing something wrong (most likely).
+
+If anyone knows how to fix this, please let me know. Either by using the taps correctly, or even better, just getting direct access to video ram in Lua.
