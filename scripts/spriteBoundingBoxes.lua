@@ -29,7 +29,6 @@ FIX_LAYER = 0x7000
 SHOW_SPRITES = true
 SHOW_FIX_LAYER = true
 
--- "emulate" vram to grab the data writes and store them in the vram table
 function on_vram_write(offset, data)
 	if offset == REG_VRAMADDR then
 		next_vram_index = data
@@ -40,7 +39,6 @@ function on_vram_write(offset, data)
 	end
 
 	if offset == REG_VRAMRW then
-		vram[next_vram_index] = data
 		next_vram_index = next_vram_index + vram_index_mod
 
 		if (not SHOW_FIX_LAYER) and next_vram_index >= FIX_LAYER and next_vram_index <= SCB2 then
@@ -174,7 +172,16 @@ function visualize_boundingBoxes()
 	end
 end
 
+vramdevice = emu.item(manager.machine.devices[":spritegen"].items["0/m_videoram"])
+
+function grab_vram()
+	for i = 0, VRAM_SIZE - 1 do
+		vram[i] = vramdevice:read(i)
+	end
+end
+
 function on_frame()
+	grab_vram()
 	visualize_boundingBoxes()
 end
 
