@@ -66,3 +66,17 @@ end
 function util.clamp(v, min, max)
 	return math.min(max, math.max(min, v))
 end
+
+function util.areTablesEqual(a, b)
+	if #a ~= #b then
+		return false
+	end
+
+	for k, v in pairs(a) do
+		if b[k] ~= v then
+			return false
+		end
+	end
+
+	return true
+end

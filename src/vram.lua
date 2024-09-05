@@ -1,11 +1,13 @@
 vram = {}
 
-local SCB1 = 0
-local SCB2 = 0x8000
-local SCB3 = 0x8200
-local SCB4 = 0x8400
-local VRAM_SIZE = 0x8600
-local FIX_LAYER = 0x7000
+SCB1 = 0
+SCB2 = 0x8000
+SCB3 = 0x8200
+SCB4 = 0x8400
+VRAM_SIZE = 0x8600
+FIX_LAYER = 0x7000
+FIX_WIDTH = 40
+FIX_HEIGHT = 32
 
 function vram.isSticky(si, vr)
 	local scb3Val = vr[SCB3 + si] or 0
@@ -73,6 +75,19 @@ function vram.getSpriteHeight(si, vr)
 
 	local scb3Val = vr[SCB3 + si] or 0
 	return scb3Val & 0x3f
+end
+
+-- given a sprite index and an array of vram, returns all the tiles currently used by the sprite
+function vram.getSpriteTiles(si, h, vr)
+	local tiles = {}
+
+	local base = SCB1 + si * 64
+
+	for i = 0, h - 1 do
+		tiles[i] = (vr[base + i * 2] or 0) << 16 | (vr[base + i * 2 + 1] or 0)
+	end
+
+	return tiles
 end
 
 function vram.grab_vram()
