@@ -29,3 +29,7 @@ or in the UI, enable the plugin
 Once enabled, you should see `(h) for help` in the upper right corner of a Neo Geo game.
 
 ![plugin showing help message](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/pluginInGame.png?raw=true)
+
+Press `h` to see all available commands. To toggle a command on or off, press its hotkey, for example `b` for showing sprite bounding boxes
+
+![sprite bounding boxes](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/spriteBoundingBoxes_running.png?raw=true)
