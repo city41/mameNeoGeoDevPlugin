@@ -150,9 +150,10 @@ function ngdev.startplugin()
 		end)
 	end)
 
-	-- emu.register_stop(function()
-	-- 	print("register_stop: goodbye")
-	-- end)
+	emu.register_stop(function()
+		keyboard_events.reset_bindings()
+		addons = {}
+	end)
 end
 
 return exports
