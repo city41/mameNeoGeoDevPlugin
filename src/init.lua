@@ -57,7 +57,7 @@ function ngdev.drawHelp(screen)
 		screen:draw_text(
 			x,
 			y,
-			string.format("(%s,%s) %s", a.keyGroup, a.hotkey or a.togglekey, a.name),
+			string.format("(%s,%s) %s", a.keyGroup, a.overlaykey or a.togglekey, a.name),
 			0xffffffff,
 			0xff000000
 		)
@@ -100,7 +100,7 @@ function ngdev.onFrameDone()
 				screen:draw_text(
 					0,
 					217,
-					string.format("%s, (%s) to close", focusedAddon.name, focusedAddon.hotkey),
+					string.format("%s, (%s) to close", focusedAddon.name, focusedAddon.overlaykey),
 					0xffffffff,
 					0xff000000
 				)
@@ -159,9 +159,9 @@ function ngdev.startplugin()
 					groupCallbacks[a.keyGroup] = true
 				end
 
-				if a.hotkey ~= nil then
+				if a.overlaykey ~= nil then
 					keyboard_events.register_key_event_callback(
-						string.format("KEYCODE_%s", string.upper(a.hotkey)),
+						string.format("KEYCODE_%s", string.upper(a.overlaykey)),
 						function(e)
 							if e == "pressed" and currentGroup == a.keyGroup then
 								if focusedAddon == a then
