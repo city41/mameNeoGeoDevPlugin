@@ -16,6 +16,8 @@ local helpOpen = false
 local groupCallbacks = {}
 local currentGroup = nil
 
+local welcomeMessageCountdown = 0
+
 function ngdev.onFrame()
 	keyboard_events.poll()
 end
@@ -66,32 +68,37 @@ end
 function ngdev.onFrameDone()
 	local screen = manager.machine.screens[":screen"]
 
-	ngdev.drawAddons(screen)
-
-	if not helpOpen then
-		screen:draw_text(288, 0, "(h) for help", 0xffffffff, 0xff000000)
+	if welcomeMessageCountdown > 0 then
+		welcomeMessageCountdown = welcomeMessageCountdown - 1
+		screen:draw_text("center", 0, "ngdev initialized")
 	else
-		ngdev.drawHelp(screen)
-	end
+		ngdev.drawAddons(screen)
 
-	if focusedAddon ~= nil then
-		local success, err = pcall(focusedAddon.drawOverlay, screen)
-
-		if not success then
-			print(string.format("%s.drawOverlay errored: %s", focusedAddon.name, err))
+		if not helpOpen then
+			screen:draw_text(288, 0, "(h) for help", 0xffffffff, 0xff000000)
 		else
-			screen:draw_text(
-				0,
-				217,
-				string.format("%s, (%s) to close", focusedAddon.name, focusedAddon.hotkey),
-				0xffffffff,
-				0xff000000
-			)
+			ngdev.drawHelp(screen)
 		end
-	end
 
-	if currentGroup ~= nil then
-		screen:draw_text(288, 10, string.format("group: %s", currentGroup))
+		if focusedAddon ~= nil then
+			local success, err = pcall(focusedAddon.drawOverlay, screen)
+
+			if not success then
+				print(string.format("%s.drawOverlay errored: %s", focusedAddon.name, err))
+			else
+				screen:draw_text(
+					0,
+					217,
+					string.format("%s, (%s) to close", focusedAddon.name, focusedAddon.hotkey),
+					0xffffffff,
+					0xff000000
+				)
+			end
+		end
+
+		if currentGroup ~= nil then
+			screen:draw_text(288, 10, string.format("group: %s", currentGroup))
+		end
 	end
 end
 
@@ -100,6 +107,8 @@ function ngdev.startplugin()
 		if not games.is_neogeo_game(manager.machine.system.name) then
 			return
 		end
+
+		welcomeMessageCountdown = 120
 
 		local cpu = manager.machine.devices[":maincpu"]
 		local mem = cpu.spaces["program"]
