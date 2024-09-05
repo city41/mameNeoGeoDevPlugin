@@ -6,6 +6,7 @@ exports.license = "BSD-3-Clause"
 exports.author = { name = "mgreer" }
 
 require("ngdev/keyboard_events")
+require("ngdev/games")
 
 local addons = {}
 local focusedAddon = nil
@@ -96,6 +97,10 @@ end
 
 function ngdev.startplugin()
 	emu.register_start(function()
+		if not games.is_neogeo_game(manager.machine.system.name) then
+			return
+		end
+
 		local cpu = manager.machine.devices[":maincpu"]
 		local mem = cpu.spaces["program"]
 		local screen = manager.machine.screens[":screen"]
@@ -177,6 +182,7 @@ function ngdev.startplugin()
 
 				if helpOpen then
 					focusedAddon = nil
+					currentGroup = nil
 				end
 			end
 		end)
