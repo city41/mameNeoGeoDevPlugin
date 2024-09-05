@@ -65,3 +65,5 @@ mame/plugins/
             |_ custom_addons
                 |_your_lua_addon_here.lua
 ```
+
+See [this wiki page](https://github.com/city41/mameNeoGeoDevPlugin/wiki/Writing-custom-addons) for more info on writing a custom addon.
