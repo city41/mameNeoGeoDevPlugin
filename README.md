@@ -4,11 +4,16 @@ A MAME Lua Plugin that provides information about the Neo Geo. Meant to be used 
 
 ## Installation
 
-Grab the latest [release](https://github.com/city41/mameNeoGeoDevPlugin/releases) and unzip it into your MAME plugin folder. Where this exists varies by MAME installation and OS. You can figure out where it is (and change it if needed) by launching MAME without running a game, then going to `Configure Options > Configure Directories > Plugins`
+Grab the latest [release](https://github.com/city41/mameNeoGeoDevPlugin/releases) and unzip it somewhere. Then take the contents of the `src` directory and copy into your MAME plugin folder renamed to `ngdev`. Where this exists varies by MAME installation and OS. You can figure out where it is (and change it if needed) by launching MAME without running a game, then going to `Configure Options > Configure Directories > Plugins`
 
 ![plugins path in MAME options](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/pluginDir.png?raw=true)
 
 So if your plugin direction is at `/usr/share/games/mame/plugins` like mine is, then this plugin should be at `.../mame/plugins/ngdev`
+
+```sh
+unzip mameNeoGeoDevPlugin-0.0.1.zip
+mv mameNeoGeoDevPlugin-0.0.1/src /usr/share/games/mame/plugins/ngdev
+```
 
 ## Usage
 
@@ -36,7 +41,7 @@ Press `h` to see all available commands. Commands are grouped under a letter. Fo
 
 To toggle a command on or off, press its group hotkey, then the command's hotkey. So for example to show sprite bounding boxes, press `g` followed by `b`. In the upper right it will show the current group. Once in a group you don't press the group key anymore. So for example to toggle sprite bounding boxes on and off just press `b`.
 
-![sprite bounding boxes](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/spriteBoundingBoxes_running.png?raw=true)
+![sprite bounding boxes](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/plugin_spriteBoundingBoxes.png?raw=true)
 
 So far the plugin only ships with one group, so it might seem like overkill. But there's only so many keys and many are already taken up by MAME. When extending the plugin (see below), the groups help a lot.
 
