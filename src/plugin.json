@@ -1,0 +1,10 @@
+{
+	"plugin": {
+		"name": "ngdev",
+		"description": "Neo Geo Development Tools",
+		"version": "0.0.1",
+		"author": "matt.e.greer@gmail.com",
+		"type": "plugin",
+		"start": "false"
+	}
+}

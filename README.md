@@ -1,40 +1,31 @@
-# Neo Geo Debug Scripts
+# MAME Neo Geo Dev Plugin
 
-A collection of MAME autoboot scripts for the Neo Geo
+A MAME Lua Plugin that provides information about the Neo Geo. Meant to be used for ROM hacking, game development, and those curious about the system's internals.
 
-Mostly focused on Video RAM and memory mapped registers so far.
+## Installation
 
-I'm making these a lot and throwing them away or copying/pasting, etc, so I figured I'll just collect them into this repo.
+Grab the latest [release](https://github.com/city41/mameNeoGeoDevPlugin/releases) and unzip it into your MAME plugin folder. Where this exists varies by MAME installation and OS. You can figure out where it is (and change it if needed) by launching MAME without running a game, then going to `Configure Options > Configure Directories > Plugins`
 
-Maybe eventually these will all get combined into a decent Neo Geo debug plugin.
+![plugins path in MAME options](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/pluginDir.png?raw=true)
 
-## Examples
+So if your plugin direction is at `/usr/share/games/mame/plugins` like mine is, then this plugin should be at `.../mame/plugins/ngdev`
 
-spriteLengthAndFixLayer.lua
+## Usage
 
-![sprite length and fix layer example](https://github.com/city41/ngDebugScripts/blob/main/spriteLengthAndFixLayer_running.png?raw=true)
+### Enabling the plugin
 
-spriteBoundingBoxes.lua
+From the command line, launch MAME with the plugin active via
 
-![sprite bounding boxes example](https://github.com/city41/ngDebugScripts/blob/main/spriteBoundingBoxes_running.png?raw=true)
+```sh
+mame ... -plugin ngdev
+```
 
-## To use
+or in the UI, enable the plugin
 
-### First, keyboard_events
+![enabling the plugin in MAME](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/pluginEnabled.png?raw=true)
 
-Some scripts want `keyboard_events` installed. To do that, copy `scripts/keyboard_events.lua` into your MAME installation's plugin folder. That will vary from OS to OS and even the type of MAME install. For me on Ubuntu using MAME installed from apt, it is at `/usr/share/games/mame/plugins`.
+### The plugin in action
 
-`keyboard_events` was written by stengun for the [arcademus](https://github.com/stengun/arcademus) project. Thank you!
+Once enabled, you should see `(h) for help` in the upper right corner of a Neo Geo game.
 
-### Then, launch MAME from the command line
-
-Do `mame -autoboot_script path/to/script/youwant.lua <game>`
-
-For example: `mame -autoboot_script scripts/disableTimerInterrupt.lua ridhero`
-
-If you don't normally run MAME from the command line, you may find the default way it launches not to your liking. I add these flags:
-
-- `-w`: put the game in a window instead of being full screen
-- `-nofilter`: turn off the blur filter, just get pure pixels
-- `-nomouse`: don't capture the mouse, just leave it alone
-- `-sound none`: disable audio if desired
+![plugin showing help message](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/pluginInGame.png?raw=true)

@@ -1,0 +1,158 @@
+local exports = {}
+exports.name = "ngdev"
+exports.version = "0.0.1"
+exports.description = "Neo Geo Development Tools"
+exports.license = "BSD-3-Clause"
+exports.author = { name = "mgreer" }
+
+require("ngdev/keyboard_events")
+
+local addons = {}
+local focusedAddon = nil
+local ngdev = exports
+local helpOpen = false
+
+function ngdev.onFrame()
+	keyboard_events.poll()
+end
+
+function ngdev.getAddons()
+	local addons = {}
+	local pluginDir = manager.options.entries.pluginspath:value()
+	for addonFileName in io.popen(string.format("ls %s/ngdev/addons", pluginDir)):lines() do
+		local addonHydrate = assert(loadfile(pluginDir .. "/ngdev/addons/" .. addonFileName))
+		local success, addonOrErr = pcall(addonHydrate)
+
+		if not success then
+			print(string.format("Addon failed to hydrate: %s", addonOrErr))
+		else
+			table.insert(addons, addonOrErr)
+		end
+	end
+
+	return addons
+end
+
+function ngdev.drawHelp(screen)
+	local x = 20
+	local y = 10
+	for _, a in ipairs(addons) do
+		screen:draw_text(x, y, string.format("(%s) %s", a.hotkey or a.togglekey, a.name), 0xffffffff, 0xff000000)
+		y = y + 10
+	end
+end
+
+function ngdev.drawAddons(screen)
+	for _, a in ipairs(addons) do
+		if a.draw ~= nil then
+			local success, err = pcall(a.draw, screen)
+			if not success then
+				print(string.format("%s.draw errored: %s", a.name, err))
+			end
+		end
+	end
+end
+
+function ngdev.onFrameDone()
+	local screen = manager.machine.screens[":screen"]
+
+	ngdev.drawAddons(screen)
+
+	if not helpOpen then
+		screen:draw_text(288, 0, "(h) for help", 0xffffffff, 0xff000000)
+	else
+		ngdev.drawHelp(screen)
+	end
+
+	if focusedAddon ~= nil then
+		local success, err = pcall(focusedAddon.drawOverlay, screen)
+
+		if not success then
+			print(string.format("%s.drawOverlay errored: %s", focusedAddon.name, err))
+		else
+			screen:draw_text(
+				0,
+				217,
+				string.format("%s, (%s) to close", focusedAddon.name, focusedAddon.hotkey),
+				0xffffffff,
+				0xff000000
+			)
+		end
+	end
+end
+
+function ngdev.startplugin()
+	emu.register_start(function()
+		local cpu = manager.machine.devices[":maincpu"]
+		local mem = cpu.spaces["program"]
+		local screen = manager.machine.screens[":screen"]
+
+		local success, errOrData = pcall(ngdev.getAddons)
+
+		if success then
+			addons = errOrData
+			print(string.format("%d addons", #addons))
+
+			for _, a in ipairs(addons) do
+				if a.init ~= nil then
+					local initSuccess, initErr = pcall(a.init, cpu, mem, screen)
+					if not initSuccess then
+						print(string.format("%s.init() errored: %s", a.name, initErr))
+					end
+				end
+
+				if a.hotkey ~= nil then
+					keyboard_events.register_key_event_callback(
+						string.format("KEYCODE_%s", string.upper(a.hotkey)),
+						function(e)
+							if e == "pressed" then
+								if focusedAddon == a then
+									focusedAddon = nil
+								else
+									focusedAddon = a
+									helpOpen = false
+								end
+							end
+						end
+					)
+				end
+
+				if a.togglekey ~= nil then
+					if a.toggled == nil then
+						print(string.format("error, addon %s has togglekey but no toggled() function", a.name))
+					else
+						keyboard_events.register_key_event_callback(
+							string.format("KEYCODE_%s", string.upper(a.togglekey)),
+							function(e)
+								if e == "pressed" then
+									a.toggled()
+								end
+							end
+						)
+					end
+				end
+			end
+		else
+			print("error getting addons", errOrData)
+		end
+
+		emu.register_frame(ngdev.onFrame, "frame")
+		emu.register_frame_done(ngdev.onFrameDone, "frame_done")
+
+		keyboard_events.register_key_event_callback("KEYCODE_H", function(e)
+			if e == "pressed" then
+				helpOpen = not helpOpen
+
+				if helpOpen then
+					focusedAddon = nil
+				end
+			end
+		end)
+	end)
+
+	-- emu.register_stop(function()
+	-- 	print("register_stop: goodbye")
+	-- end)
+end
+
+return exports
