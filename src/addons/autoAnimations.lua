@@ -2,6 +2,7 @@ require("ngdev/util")
 require("ngdev/vram")
 
 local addon = {}
+addon.keyGroup = "g"
 addon.togglekey = "n"
 addon.name = "auto animations"
 

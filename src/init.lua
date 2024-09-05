@@ -12,6 +12,9 @@ local focusedAddon = nil
 local ngdev = exports
 local helpOpen = false
 
+local groupCallbacks = {}
+local currentGroup = nil
+
 function ngdev.onFrame()
 	keyboard_events.poll()
 end
@@ -37,7 +40,13 @@ function ngdev.drawHelp(screen)
 	local x = 20
 	local y = 10
 	for _, a in ipairs(addons) do
-		screen:draw_text(x, y, string.format("(%s) %s", a.hotkey or a.togglekey, a.name), 0xffffffff, 0xff000000)
+		screen:draw_text(
+			x,
+			y,
+			string.format("(%s,%s) %s", a.keyGroup, a.hotkey or a.togglekey, a.name),
+			0xffffffff,
+			0xff000000
+		)
 		y = y + 10
 	end
 end
@@ -79,6 +88,10 @@ function ngdev.onFrameDone()
 			)
 		end
 	end
+
+	if currentGroup ~= nil then
+		screen:draw_text(288, 10, string.format("group: %s", currentGroup))
+	end
 end
 
 function ngdev.startplugin()
@@ -101,11 +114,30 @@ function ngdev.startplugin()
 					end
 				end
 
+				if a.keyGroup == nil then
+					print(string.format("error, % lacks a keyGroup", a.name))
+				end
+
+				if not groupCallbacks[a.keyGroup] then
+					keyboard_events.register_key_event_callback(
+						string.format("KEYCODE_%s", string.upper(a.keyGroup)),
+						function(e)
+							if e == "pressed" then
+								if currentGroup == a.keyGroup then
+									currentGroup = nil
+								else
+									currentGroup = a.keyGroup
+								end
+							end
+						end
+					)
+				end
+
 				if a.hotkey ~= nil then
 					keyboard_events.register_key_event_callback(
 						string.format("KEYCODE_%s", string.upper(a.hotkey)),
 						function(e)
-							if e == "pressed" then
+							if e == "pressed" and currentGroup == a.keyGroup then
 								if focusedAddon == a then
 									focusedAddon = nil
 								else
@@ -124,7 +156,7 @@ function ngdev.startplugin()
 						keyboard_events.register_key_event_callback(
 							string.format("KEYCODE_%s", string.upper(a.togglekey)),
 							function(e)
-								if e == "pressed" then
+								if e == "pressed" and currentGroup == a.keyGroup then
 									a.toggled()
 								end
 							end

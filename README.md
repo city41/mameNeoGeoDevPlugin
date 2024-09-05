@@ -28,8 +28,33 @@ or in the UI, enable the plugin
 
 Once enabled, you should see `(h) for help` in the upper right corner of a Neo Geo game.
 
-![plugin showing help message](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/pluginInGame.png?raw=true)
+![plugin in initial state](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/pluginInGame_nothingActive.png?raw=true)
 
-Press `h` to see all available commands. To toggle a command on or off, press its hotkey, for example `b` for showing sprite bounding boxes
+Press `h` to see all available commands. Commands are grouped under a letter. For example all graphic related commands are under `g`.
+
+![plugin showing help message](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/pluginInGame_helpMessage.png?raw=true)
+
+To toggle a command on or off, press its group hotkey, then the command's hotkey. So for example to show sprite bounding boxes, press `g` followed by `b`. In the upper right it will show the current group. Once in a group you don't press the group key anymore. So for example to toggle sprite bounding boxes on and off just press `b`.
 
 ![sprite bounding boxes](https://github.com/city41/mameNeoGeoDevPlugin/blob/main/spriteBoundingBoxes_running.png?raw=true)
+
+So far the plugin only ships with one group, so it might seem like overkill. But there's only so many keys and many are already taken up by MAME. When extending the plugin (see below), the groups help a lot.
+
+## Extending the plugin
+
+You can add your own extensions to the plugin. I do this myself to add things needed for the game I am writing.
+
+To do so, create a `custom_addons` folder next to the standard `addons` folder inside the `ngdev` plugin folder in the MAME plugins folder.
+
+So it will look like this
+
+```
+mame/plugins/
+        |_ ngdev
+            |_ addons
+            |   |_ (these are the standard addons)
+            |   |_ spriteUsage.lua
+            |   |_ ...
+            |_ custom_addons
+                |_your_lua_addon_here.lua
+```
