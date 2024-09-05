@@ -36,8 +36,8 @@ function ngdev.getAddons()
 		end
 	end
 
-	for customAddonFileName in io.popen(string.format("ls %s/ngdev/custom_addons/*.lua 2>/dev/null", pluginDir)):lines() do
-		local addonPath = assert(loadfile(addonPath))
+	for customAddonPath in io.popen(string.format("ls %s/ngdev/custom_addons/*.lua 2>/dev/null", pluginDir)):lines() do
+		local addonHydrate = assert(loadfile(customAddonPath))
 		local success, addonOrErr = pcall(addonHydrate)
 
 		if not success then
@@ -156,6 +156,7 @@ function ngdev.startplugin()
 							end
 						end
 					)
+					groupCallbacks[a.keyGroup] = true
 				end
 
 				if a.hotkey ~= nil then
