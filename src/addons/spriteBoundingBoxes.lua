@@ -1,10 +1,9 @@
 require("ngdev/util")
+require("ngdev/vram")
 
 local addon = {}
 addon.togglekey = "b"
 addon.name = "sprite bounding boxes"
-
-local vram = {}
 
 local SCB1 = 0
 local SCB2 = 0x8000
@@ -27,85 +26,17 @@ function addon.toggled()
 	showBoundingBoxes = not showBoundingBoxes
 end
 
-function addon.isSticky(si, vr)
-	local scb3Val = vr[SCB3 + si] or 0
-
-	return scb3Val & 0x40 == 0x40
-end
-
-function addon.getSpriteHeight(si, vr)
-	if isSticky(si, vr) then
-		return getSpriteHeight(si - 1, vr)
-	end
-
-	local scb3Val = vr[SCB3 + si] or 0
-	return scb3Val & 0x3f
-end
-
-function addon.dewrap(v, wrapBoundary)
-	while v > wrapBoundary do
-		v = v - 512
-	end
-
-	while v < -wrapBoundary do
-		v = v + 512
-	end
-
-	return v
-end
-
-function addon.getSpriteY(si, vr)
-	if addon.isSticky(si, vr) then
-		return addon.getSpriteY(si - 1, vr)
-	end
-
-	local scb3Val = vr[SCB3 + si] or 0
-
-	local y = scb3Val >> 7
-
-	-- handle 9 bit two's compliment
-	if y > 256 then
-		y = y - 512
-	end
-
-	y = 496 - y
-
-	return y
-end
-
--- TODO: support sprite scaling
-function addon.getSpriteX(si, vr)
-	if addon.isSticky(si, vr) then
-		return addon.getSpriteX(si - 1, vr) + 16
-	end
-
-	local scb4Val = vr[SCB4 + si] or 0
-
-	x = scb4Val >> 7
-
-	return x
-end
-
-function addon.getSpriteHeight(si, vr)
-	if addon.isSticky(si, vr) then
-		return addon.getSpriteHeight(si - 1, vr)
-	end
-
-	local scb3Val = vr[SCB3 + si] or 0
-	return scb3Val & 0x3f
-end
-
-function addon.visualize_boundingBoxes(screen)
+function addon.visualize_boundingBoxes(screen, vramData)
 	for i = 0, 380 do
-		local ht = addon.getSpriteHeight(i, vram)
+		local ht = vram.getSpriteHeight(i, vramData)
 		local hpx = ht * 16
-		local x = addon.dewrap(addon.getSpriteX(i, vram), 320)
-		local y = addon.dewrap(addon.getSpriteY(i, vram), 224)
+		local x = vram.dewrap(vram.getSpriteX(i, vramData), 320)
+		local y = vram.dewrap(vram.getSpriteY(i, vramData), 224)
 
 		local left = x
 		local top = y
 		-- TODO: support sprite scaling
-		local right = addon.dewrap(x + 16, 320)
+		local right = vram.dewrap(x + 16, 320)
 		-- TODO: support sprite scaling
 		local bottom = y + hpx
 
@@ -140,17 +71,10 @@ function addon.visualize_boundingBoxes(screen)
 	end
 end
 
-function addon.grab_vram()
-	local vramdevice = emu.item(manager.machine.devices[":spritegen"].items["0/m_videoram"])
-	for i = 0, VRAM_SIZE - 1 do
-		vram[i] = vramdevice:read(i)
-	end
-end
-
 function addon.draw(screen)
 	if showBoundingBoxes then
-		addon.grab_vram()
-		addon.visualize_boundingBoxes(screen)
+		local vramData = vram.grab_vram()
+		addon.visualize_boundingBoxes(screen, vramData)
 	end
 end
 
