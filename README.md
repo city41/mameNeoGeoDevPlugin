@@ -2,6 +2,8 @@
 
 A MAME Lua Plugin that provides information about the Neo Geo. Meant to be used for ROM hacking, game development, and those curious about the system's internals.
 
+**WARNING:** this will not work on Windows (yet) and may not work on MacOS either. There are Linux specific things in the plugin that need to be worked out. See [this issue](https://github.com/city41/mameNeoGeoDevPlugin/issues/2).
+
 ## Installation
 
 Grab the latest [release](https://github.com/city41/mameNeoGeoDevPlugin/releases) and unzip it somewhere. Then take the contents of the `src` directory and copy into your MAME plugin folder renamed to `ngdev`. Where this exists varies by MAME installation and OS. You can figure out where it is (and change it if needed) by launching MAME without running a game, then going to `Configure Options > Configure Directories > Plugins`

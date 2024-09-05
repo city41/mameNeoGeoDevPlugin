@@ -25,8 +25,8 @@ end
 function ngdev.getAddons()
 	local addons = {}
 	local pluginDir = manager.options.entries.pluginspath:value()
-	for addonFileName in io.popen(string.format("ls %s/ngdev/addons/*.lua", pluginDir)):lines() do
-		local addonHydrate = assert(loadfile(pluginDir .. "/ngdev/addons/" .. addonFileName))
+	for addonPath in io.popen(string.format("ls %s/ngdev/addons/*.lua", pluginDir)):lines() do
+		local addonHydrate = assert(loadfile(addonPath))
 		local success, addonOrErr = pcall(addonHydrate)
 
 		if not success then
@@ -36,8 +36,8 @@ function ngdev.getAddons()
 		end
 	end
 
-	for customAddonFileName in io.popen(string.format("ls %s/ngdev/custom_addons/*.lua", pluginDir)):lines() do
-		local addonHydrate = assert(loadfile(pluginDir .. "/ngdev/addons/" .. addonFileName))
+	for customAddonFileName in io.popen(string.format("ls %s/ngdev/custom_addons/*.lua 2>/dev/null", pluginDir)):lines() do
+		local addonPath = assert(loadfile(addonPath))
 		local success, addonOrErr = pcall(addonHydrate)
 
 		if not success then
