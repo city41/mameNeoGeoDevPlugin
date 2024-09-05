@@ -1,5 +1,11 @@
 vram = {}
 
+-- where the game wants to write in VRAM
+REG_VRAMADDR = 0x3c0000
+-- how much to move the index after a write
+REG_VRAMMOD = 0x3c0004
+-- a data write
+REG_VRAMRW = 0x3c0002
 SCB1 = 0
 SCB2 = 0x8000
 SCB3 = 0x8200
@@ -88,6 +94,30 @@ function vram.getSpriteTiles(si, h, vr)
 	end
 
 	return tiles
+end
+
+function vram.getSpriteControlBlock(i)
+	if i < FIX_LAYER then
+		if i & 1 == 1 then
+			return "scb1/odd"
+		else
+			return "scb1/even"
+		end
+	end
+
+	if i < SCB2 then
+		return "fix"
+	end
+
+	if i < SCB3 then
+		return "scb2"
+	end
+
+	if i < SCB4 then
+		return "scb3"
+	end
+
+	return "scb4"
 end
 
 function vram.grab_vram()
