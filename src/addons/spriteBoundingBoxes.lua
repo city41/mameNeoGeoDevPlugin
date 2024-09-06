@@ -3,7 +3,7 @@ require("ngdev/vram")
 
 local addon = {}
 addon.keyGroup = "g"
-addon.togglekey = "b"
+addon.toggleKey = "b"
 addon.name = "sprite bounding boxes"
 
 local SCB1 = 0

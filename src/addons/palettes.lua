@@ -3,7 +3,7 @@ require("ngdev/vram")
 
 local addon = {}
 addon.keyGroup = "g"
-addon.togglekey = "c"
+addon.toggleKey = "c"
 addon.name = "palettes"
 
 local vram_handler = nil

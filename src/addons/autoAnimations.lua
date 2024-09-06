@@ -3,7 +3,7 @@ require("ngdev/vram")
 
 local addon = {}
 addon.keyGroup = "g"
-addon.togglekey = "n"
+addon.toggleKey = "n"
 addon.name = "auto animations"
 
 -- -1 means dont mess with them, just let the game do them

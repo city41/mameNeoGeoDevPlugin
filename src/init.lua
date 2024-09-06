@@ -57,7 +57,7 @@ function ngdev.drawHelp(screen)
 		screen:draw_text(
 			x,
 			y,
-			string.format("(%s,%s) %s", a.keyGroup, a.overlayKey or a.togglekey, a.name),
+			string.format("(%s,%s) %s", a.keyGroup, a.overlayKey or a.toggleKey, a.name),
 			0xffffffff,
 			0xff000000
 		)
@@ -175,12 +175,12 @@ function ngdev.startplugin()
 					)
 				end
 
-				if a.togglekey ~= nil then
+				if a.toggleKey ~= nil then
 					if a.toggled == nil then
-						print(string.format("error, addon %s has togglekey but no toggled() function", a.name))
+						print(string.format("error, addon %s has toggleKey but no toggled() function", a.name))
 					else
 						keyboard_events.register_key_event_callback(
-							string.format("KEYCODE_%s", string.upper(a.togglekey)),
+							string.format("KEYCODE_%s", string.upper(a.toggleKey)),
 							function(e)
 								if e == "pressed" and currentGroup == a.keyGroup then
 									a.toggled()

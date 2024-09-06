@@ -3,7 +3,7 @@ require("ngdev/vram")
 
 local addon = {}
 addon.keyGroup = "g"
-addon.togglekey = "f"
+addon.toggleKey = "f"
 addon.name = "fix layer"
 
 local prev_vramData = {}

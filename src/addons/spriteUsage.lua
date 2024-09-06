@@ -3,7 +3,7 @@ require("ngdev/vram")
 
 local addon = {}
 addon.keyGroup = "g"
-addon.togglekey = "s"
+addon.toggleKey = "s"
 addon.name = "sprite usage"
 
 local prev_vramData = {}
