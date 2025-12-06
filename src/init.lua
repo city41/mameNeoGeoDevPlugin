@@ -25,7 +25,21 @@ end
 function ngdev.getAddons()
 	local addons = {}
 	local pluginDir = manager.options.entries.pluginspath:value()
-	for addonPath in io.popen(string.format("ls %s/ngdev/addons/*.lua", pluginDir)):lines() do
+	
+	-- Detect OS for proper command
+	local isWindows = package.config:sub(1,1) == '\\'
+	local listCmd = isWindows and 'dir /b /a-d' or 'ls'
+	local nullRedirect = isWindows and '2>nul' or '2>/dev/null'
+	
+	-- Use proper path separator
+	local pathSep = isWindows and '\\' or '/'
+	
+	for addonPath in io.popen(string.format('%s "%s%sngdev%saddons%s*.lua" %s', listCmd, pluginDir, pathSep, pathSep, pathSep, nullRedirect)):lines() do
+		-- On Windows, dir returns relative paths, so we need to build the full path
+		if isWindows then
+			addonPath = string.format('%s%sngdev%saddons%s%s', pluginDir, pathSep, pathSep, pathSep, addonPath)
+		end
+		
 		local addonHydrate = assert(loadfile(addonPath))
 		local success, addonOrErr = pcall(addonHydrate)
 
@@ -36,7 +50,12 @@ function ngdev.getAddons()
 		end
 	end
 
-	for customAddonPath in io.popen(string.format("ls %s/ngdev/custom_addons/*.lua 2>/dev/null", pluginDir)):lines() do
+	for customAddonPath in io.popen(string.format('%s "%s%sngdev%scustom_addons%s*.lua" %s', listCmd, pluginDir, pathSep, pathSep, pathSep, nullRedirect)):lines() do
+		-- On Windows, dir returns relative paths, so we need to build the full path
+		if isWindows then
+			customAddonPath = string.format('%s%sngdev%scustom_addons%s%s', pluginDir, pathSep, pathSep, pathSep, customAddonPath)
+		end
+		
 		local addonHydrate = assert(loadfile(customAddonPath))
 		local success, addonOrErr = pcall(addonHydrate)
 
